@@ -1,0 +1,65 @@
+The system is: Windows - 10.0.19045 - AMD64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: D:/Programms/VisualStudio2019/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+Оптимизирующий компилятор Microsoft (R) C/C++ версии 19.29.30147 для x64
+(C) Корпорация Майкрософт (Microsoft Corporation).  Все права защищены.
+
+CMakeCCompilerId.c
+Microsoft (R) Incremental Linker Version 14.29.30147.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCCompilerId.exe 
+CMakeCCompilerId.obj 
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.exe"
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.obj"
+
+The C compiler identification is MSVC, found in "E:/Projects/Programming/VisualStudio/syncD/out/build/x64-Release/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdC/CMakeCCompilerId.exe"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: D:/Programms/VisualStudio2019/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+Оптимизирующий компилятор Microsoft (R) C/C++ версии 19.29.30147 для x64
+(C) Корпорация Майкрософт (Microsoft Corporation).  Все права защищены.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30147.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.exe"
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.obj"
+
+The CXX compiler identification is MSVC, found in "E:/Projects/Programming/VisualStudio/syncD/out/build/x64-Release/CMakeFiles/3.20.21032501-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.exe"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: E:/Projects/Programming/VisualStudio/syncD/out/build/x64-Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):D:\PROGRAMMS\VISUALSTUDIO2019\COMMON7\IDE\COMMONEXTENSIONS\MICROSOFT\CMAKE\Ninja\ninja.exe cmTC_83117 && [1/2] Building C object CMakeFiles\cmTC_83117.dir\CMakeCCompilerABI.c.obj
+[2/2] Linking C executable cmTC_83117.exe
+
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: E:/Projects/Programming/VisualStudio/syncD/out/build/x64-Release/CMakeFiles/CMakeTmp
+
+Run Build Command(s):D:\PROGRAMMS\VISUALSTUDIO2019\COMMON7\IDE\COMMONEXTENSIONS\MICROSOFT\CMAKE\Ninja\ninja.exe cmTC_21ee5 && [1/2] Building CXX object CMakeFiles\cmTC_21ee5.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_21ee5.exe
+
+
+

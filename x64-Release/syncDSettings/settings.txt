@@ -1,0 +1,2 @@
+base_dir: E:\Projects
+target_dir: G:\Storage\Projects
