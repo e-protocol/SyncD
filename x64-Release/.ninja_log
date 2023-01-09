@@ -1,8 +1,16 @@
 # ninja log v5
 4	216	6948306904025204	CMakeFiles/syncD.dir/src/appicon.rc.res	a6108182afffe91e
-0	1434	6948343028632213	CMakeFiles/syncD.dir/src/syncD.cpp.obj	f792560bfd0e61fd
+1	1657	6948388993619541	CMakeFiles/syncD.dir/src/syncD.cpp.obj	f792560bfd0e61fd
 0	2531	6948306927101697	CMakeFiles/syncD.dir/src/merge.cpp.obj	41c20b81340354a
 6	1711	6948306918941729	CMakeFiles/syncD.dir/src/settings.cpp.obj	616ecb5f08717602
-1435	1661	6948343030950047	syncD.exe	286a868ace1c209c
-1	1657	6948388993619541	CMakeFiles/syncD.dir/src/syncD.cpp.obj	f792560bfd0e61fd
 1657	1981	6948388996940033	syncD.exe	286a868ace1c209c
+4	1733	6949706072855978	CMakeFiles/syncD.dir/src/syncD.cpp.obj	f792560bfd0e61fd
+7	1907	6949706074665539	CMakeFiles/syncD.dir/src/settings.cpp.obj	616ecb5f08717602
+1	2707	6949706082604383	CMakeFiles/syncD.dir/src/merge.cpp.obj	41c20b81340354a
+2707	3094	6949706086518131	syncD.exe	286a868ace1c209c
+0	7	0	clean	5327e2209fa33b64
+0	321	6949706316931007	CMakeFiles/syncD.dir/src/appicon.rc.res	a6108182afffe91e
+36	1521	6949706328968556	CMakeFiles/syncD.dir/src/syncD.cpp.obj	f792560bfd0e61fd
+32	1721	6949706330897981	CMakeFiles/syncD.dir/src/settings.cpp.obj	616ecb5f08717602
+30	2488	6949706338615400	CMakeFiles/syncD.dir/src/merge.cpp.obj	41c20b81340354a
+2488	2713	6949706340821449	syncD.exe	286a868ace1c209c

@@ -9,13 +9,13 @@ class Vector
 	std::mutex mutex;
 
 public:
-	void push_back(T t)
+	void push_back(T &t)
 	{
 		mutex.lock();
 		v.push_back(t);
 		mutex.unlock();
 	}
-	void push_front(T t)
+	void push_front(T &t)
 	{
 		mutex.lock();
 		v.push_front(t);
