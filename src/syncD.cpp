@@ -44,7 +44,7 @@ int main()
 	setlocale(0, "");
 	cout << "********************************************" << endl;
 	cout << "syncD - application for merging directories" << endl;
-	cout << "created by E-Protocol v1.0" << endl;
+	cout << "created by E-Protocol v1.1" << endl;
 	cout << "https://github.com/e-protocol" << endl;
 	cout << "********************************************" << endl;
 	cout << "type \"help\" to see commands list" << endl;

@@ -12,24 +12,21 @@ void Settings::readSettings()
 		vector<string> v;
 		string s;
 
-		while (file)
-			s.push_back(file.get());
-
-		file.close();
-		string pStr;
-
-		for (auto& c : s)
+		while (getline(file, s))
 		{
-			if (c == ' ' || c == '\n' 
-				|| c == ifstream::traits_type::eof())
+			int i = s.find_first_of(' ');
+
+			if (i < 1 || i == s.size() - 1)
 			{
-				v.push_back(pStr);
-				pStr.clear();
-				continue;
+				createNewFile();
+				return;
 			}
 
-			pStr.push_back(c);
+			v.push_back(s.substr(0, i - 1)); //get folder type (base_dir or target_dir)
+			v.push_back(s.substr(i + 1, s.size() - 1)); //get folder path
 		}
+			
+		file.close();
 
 		if (v.size() != 4)
 			createNewFile();

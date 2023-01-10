@@ -14,3 +14,12 @@
 32	1721	6949706330897981	CMakeFiles/syncD.dir/src/settings.cpp.obj	616ecb5f08717602
 30	2488	6949706338615400	CMakeFiles/syncD.dir/src/merge.cpp.obj	41c20b81340354a
 2488	2713	6949706340821449	syncD.exe	286a868ace1c209c
+3	1557	6950963312617756	CMakeFiles/syncD.dir/src/syncD.cpp.obj	f792560bfd0e61fd
+0	1715	6950963314224773	CMakeFiles/syncD.dir/src/settings.cpp.obj	616ecb5f08717602
+1715	2199	6950963319132027	syncD.exe	286a868ace1c209c
+0	8	0	clean	5327e2209fa33b64
+1	284	6950964419744717	CMakeFiles/syncD.dir/src/appicon.rc.res	a6108182afffe91e
+36	1545	6950964432379846	CMakeFiles/syncD.dir/src/syncD.cpp.obj	f792560bfd0e61fd
+33	1745	6950964434311704	CMakeFiles/syncD.dir/src/settings.cpp.obj	616ecb5f08717602
+30	2573	6950964442554515	CMakeFiles/syncD.dir/src/merge.cpp.obj	41c20b81340354a
+2573	2779	6950964444619143	syncD.exe	286a868ace1c209c
