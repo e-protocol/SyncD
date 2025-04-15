@@ -1,148 +1,150 @@
-#include "settings.h"
+#include "include/settings.h"
+#include <windows.h>
+#include <codecvt>
 
 void Settings::readSettings()
 {
-	ifstream file;
-	file.open(GetCurrentDirectory() + "\\" + settingsFolder + "\\" + settingsFile);
+	std::ifstream file;
+	file.open(getCurrentDir() + "\\" + m_settingsDir + "\\" + m_settingsFile);
 
 	if (!file.is_open())
 		createNewFile();
 	else
 	{
-		vector<string> v;
-		string s;
+		std::string s;
 
-		while (getline(file, s))
+		while (std::getline(file, s))
 		{
-			int i = s.find_first_of(' ');
-
-			if (i < 1 || i == s.size() - 1)
-			{
-				createNewFile();
-				return;
-			}
-
-			v.push_back(s.substr(0, i - 1)); //get folder type (base_dir or target_dir)
-			v.push_back(s.substr(i + 1, s.size() - 1)); //get folder path
-		}
+			std::string str = s.substr(s.find(' ') + 1, s.size());
 			
-		file.close();
+			if (str.empty())
+				continue;
 
-		if (v.size() != 4)
-			createNewFile();
-		else
-		{
-			baseDir = v[1];
-			targetDir = v[3];
+			if (m_baseDir.empty())
+				m_baseDir = str;
+			else
+				m_targetDir = str;
 		}
+
+		file.close();
 	}
 
-	showPath();
+	if (!checkDirs())
+	{
+		showPath();
+		return;
+	}
 
-	if (std::filesystem::is_directory(targetDir) &&
-		std::filesystem::is_directory(baseDir))
-		Merge::compareDirs(baseDir, targetDir);
+	if (std::filesystem::is_directory(m_baseDir))
+		m_merge->initDir(std::move(m_baseDir), Merge::BASE);
+
+	if (std::filesystem::is_directory(m_targetDir))
+		m_merge->initDir(std::move(m_targetDir), Merge::TARGET);
+
+	showPath();
+	m_merge->initDirTree(m_baseDir, m_targetDir);
+}
+
+bool Settings::checkDirs()
+{
+	bool ok = true;
+
+	if (!m_baseDir.empty() && !std::filesystem::exists(m_baseDir))
+	{
+		std::cout << "Error: Not exist base_dir: " << m_baseDir << std::endl;
+		ok = false;
+	}
+
+	if (!m_targetDir.empty() && !std::filesystem::exists(m_targetDir))
+	{
+		std::cout << "Error: Not exist target_dir: " << m_targetDir << std::endl;
+		ok = false;
+	}
+
+	if (m_baseDir.empty() && m_targetDir.empty())
+		return false;
+
+	return ok;
+}
+
+void Settings::showPath()
+{
+	std::cout << "base_dir: " << m_baseDir << "\n"
+		<< "target_dir: " << m_targetDir << std::endl;
 }
 
 void Settings::writeSettings()
 {
-	ifstream file(GetCurrentDirectory() + "\\" + settingsFolder + "\\" + settingsFile);
+	std::ifstream file(getCurrentDir() + "\\" + m_settingsDir + "\\" + m_settingsFile);
 
 	!file.is_open() ? createNewFile() : file.close();
 
-	ofstream f(GetCurrentDirectory() + "\\" + settingsFolder + "\\" + settingsFile, ofstream::trunc);
+	std::ofstream f(getCurrentDir() + "\\" + m_settingsDir + "\\" + m_settingsFile, std::ofstream::trunc);
 
 	if (f.is_open())
 	{
-		f << "base_dir: " << baseDir << "\n"
-			<< "target_dir: " << targetDir;
+		f << "base_dir: " << m_baseDir << "\n"
+			<< "target_dir: " << m_targetDir;
 		f.close();
 	}
 }
 
 void Settings::createNewFile()
 {
-	if(!std::filesystem::exists(settingsFolder))
-		std::filesystem::create_directories(settingsFolder);
+	if (!std::filesystem::exists(m_settingsDir))
+		std::filesystem::create_directories(m_settingsDir);
 
-	ofstream newFile(GetCurrentDirectory() + "\\" + settingsFolder + "\\" + settingsFile);
+	std::ofstream newFile(getCurrentDir() + "\\" + m_settingsDir + "\\" + m_settingsFile);
 	newFile << "base_dir: \ntarget_dir: ";
 	newFile.close();
-	showPath();
 }
 
-void Settings::setBasePath(string& arg)
+void Settings::setPath(const std::string& path, Merge::DirType t)
 {
-	if (!std::filesystem::is_directory(arg))
+	if (!std::filesystem::is_directory(path))
 	{
-		cout << "Invalid directory!" << endl;
+		std::string str = t == Merge::BASE ? "base" : "target";
+		std::cout << "Invalid " << str <<  " directory!" << std::endl;
 		return;
 	}
 
-	if (arg == baseDir)
-	{
-		cout << "target directory should not be equal to base directory!" << endl;
-		return;
-	}
+	if(t == Merge::BASE)
+		m_baseDir = path;
+	else
+		m_targetDir = path;
 
-	baseDir = arg;
 	writeSettings();
-	fileStats(arg, Merge::BASE);
-}
-
-void Settings::setTargetPath(string& arg)
-{
-	if (!std::filesystem::is_directory(arg))
-	{
-		cout << "Invalid directory!" << endl;
-		return;
-	}
-
-	if (arg == baseDir)
-	{
-		cout << "target directory should not be equal to base directory!" << endl;
-		return;
-	}
-
-	targetDir = arg;
-	writeSettings();
-	fileStats(arg, Merge::TARGET);
-
-	if (!std::filesystem::is_directory(baseDir))
-		Merge::compareDirs(baseDir, targetDir);
-}
-
-void Settings::showPath()
-{
-	cout << "base Dir: " << baseDir << "\n" <<
-		"target Dir: " << targetDir << "\n" << endl;
-
-	if (std::filesystem::is_directory(baseDir))
-	{
-		fileStats(baseDir, Merge::BASE);
-		cout << endl;
-	}
-
-	if (std::filesystem::is_directory(targetDir))
-	{
-		fileStats(targetDir, Merge::TARGET);
-		cout << endl;
-	}
+	m_merge->initDir(path, t);
 }
 
 void Settings::mergeDirs()
 {
-	if (baseDir.empty())
+	if (m_baseDir.empty() || m_targetDir.empty() || m_baseDir == m_targetDir)
 	{
-		cout << "Invalid base directory!" << endl;
+		std::cout << "Invalid dirs!" << std::endl;
 		return;
 	}
 
-	if (targetDir.empty())
+	if (checkDirs())
+		m_merge->mergeDirs(m_baseDir, m_targetDir);
+}
+
+void Settings::viewDirStats()
+{
+	if (m_baseDir.empty() && m_targetDir.empty())
 	{
-		cout << "Invalid target directory!" << endl;
+		showPath();
 		return;
 	}
 
-	Merge::mergeDirs(baseDir, targetDir);
+	if(checkDirs())
+		m_merge->initDirTree(m_baseDir, m_targetDir);
+}
+
+std::string Settings::getCurrentDir()
+{
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	std::string::size_type pos = std::string(buffer).find_last_of("\\");
+	return std::string(buffer).substr(0, pos);
 }

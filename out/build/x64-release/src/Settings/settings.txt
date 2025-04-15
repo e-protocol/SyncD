@@ -1,0 +1,2 @@
+base_dir: E:\Programming\Linux
+target_dir: D:\Programs\VisualStudio2022\targetDir

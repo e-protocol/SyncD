@@ -1,3 +1,0 @@
-E:/Projects/Programming/VisualStudio/syncD/out/build/x64-Release/CMakeFiles/syncD.dir
-E:/Projects/Programming/VisualStudio/syncD/out/build/x64-Release/CMakeFiles/edit_cache.dir
-E:/Projects/Programming/VisualStudio/syncD/out/build/x64-Release/CMakeFiles/rebuild_cache.dir

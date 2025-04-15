@@ -1,2 +1,0 @@
-base_dir: E:\Job\RobicLab\QtProjects\RobicLabMP\working versions\v1.0.8
-target_dir: G:\Storage\Job\RobicLab\QtProjects\RobicLabMP\working versions\v1.0.8
