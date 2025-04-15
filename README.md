@@ -2,8 +2,8 @@
 ## SyncD
 
 ## Description
-App for merging directories or cloning disks.
-Multi-threaded.
+App for merging directories or cloning disks.</br>
+Multi-threaded.</br>
 Target OS: Windows 10 
 
 ## Update
