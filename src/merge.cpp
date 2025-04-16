@@ -36,8 +36,7 @@ void Merge::compareDirs()
 
 void Merge::doMerge()
 {
-	using namespace std::filesystem;
-	m_taskCount = 3; //avoid blockScreen.wait() called before all tasks are proceed
+	m_taskCount = 1; //avoid blockScreen.wait() called before all tasks are proceed
 	m_st.setTotalFiles(m_dirTreeBase->getUnexistedFiles().size() + m_dirTreeTarget->getUnexistedFiles().size() +
 		m_dirTreeBase->getUnexistedDirs().size() + m_dirTreeTarget->getUnexistedDirs().size());
 
@@ -46,90 +45,15 @@ void Merge::doMerge()
 			m_blockScreen.block("Merging dirs", &m_st);
 		});
 
-	m_pool->addTask([this]() //remove unexisting dirs from target
+	m_pool->addTask([this]() 
 		{
-			for (auto& d : m_dirTreeTarget->getUnexistedDirs())
-			{
-				try 
-				{
-					if (exists(d->getPath()))
-						remove_all(d->getPath());
-				}
-				catch (std::exception& e)
-				{
-					m_errorMsg->add(e);
-				}
-				m_st.addProgress(1);
-			}
-			callback(false);
-		});
-	
-	m_pool->addTask([this]() //add unexisting dirs to target
-		{
-			std::string target = m_dirTreeTarget->getHead()->getPath().string();
-			std::string base = m_dirTreeBase->getHead()->getPath().string();
-
-			for (auto& d : m_dirTreeBase->getUnexistedDirs())
-			{
-				try
-				{
-					path dir(d->getPath());
-					path p(target + dir.string().substr(base.size(), dir.string().size() - 1));
-					create_directories(p); 
-				}
-				catch (std::exception& e)
-				{
-					m_errorMsg->add(e);
-				}
-				m_st.addProgress(1);
-			}
+			removeFiles();
+			removeDirs();
+			addDirs();
+			addFiles();
 			callback(false);
 		});
 
-	while (m_taskCount != 1);
-	m_taskCount += 2; //call blockScreen.wait() on all tasks proceed
-	//sync here before process operations with files
-	
-	m_pool->addTask([this]() //remove unexisting files from target
-		{
-			for (auto& f : m_dirTreeTarget->getUnexistedFiles())
-			{
-				try
-				{
-					if (exists(f))
-						remove(f);
-				}
-				catch (std::exception& e)
-				{
-					m_errorMsg->add(e);
-				}
-				m_st.addProgress(1);
-			}
-			callback(false);
-		});
-
-	m_pool->addTask([this]() //add unexisting files to target
-		{
-			std::string target = m_dirTreeTarget->getHead()->getPath().string();
-			std::string base = m_dirTreeBase->getHead()->getPath().string();
-
-			for (auto& f : m_dirTreeBase->getUnexistedFiles())
-			{
-				try
-				{
-					const auto targetParentPath = path(target) / relative(f, base).parent_path();
-					copy(f, targetParentPath, copy_options::overwrite_existing | copy_options::copy_symlinks);
-				}
-				catch (std::exception& e)
-				{
-					m_errorMsg->add(e);
-				}
-				m_st.addProgress(1);
-			}
-			callback(false);
-		});
-
-	m_taskCount--;
 	m_pool->wait();
 	m_errorMsg->printErrors();
 }
@@ -154,6 +78,12 @@ void Merge::callback(bool showStats)
 
 void Merge::mergeDirs(const std::string& basePath, const std::string& targetPath)
 {
+	if (basePath.empty() || targetPath.empty() || basePath == targetPath)
+	{
+		std::cout << "Invalid dirs!" << std::endl;
+		return;
+	}
+
 	initDirTree(basePath, targetPath);
 	compareDirs();
 
@@ -164,6 +94,8 @@ void Merge::mergeDirs(const std::string& basePath, const std::string& targetPath
 		return;
 	}
 	doMerge();
+	checkRecycleBin();
+	freeMemory();
 }
 
 void Merge::initDirTree(const std::string& basePath, const std::string& targetPath)
@@ -171,7 +103,12 @@ void Merge::initDirTree(const std::string& basePath, const std::string& targetPa
 	m_errorMsg->clear();
 	initDir(basePath, BASE);
 	initDir(targetPath, TARGET);
-	m_taskCount = 2; //call blockScreen.wait() on all tasks proceed
+
+	//call blockScreen.wait() on all tasks proceed
+	if (m_dirTreeBase)
+		m_taskCount++;
+	if (m_dirTreeTarget)
+		m_taskCount++;
 
 	m_pool->addTask([this]()
 		{
@@ -205,19 +142,10 @@ void Merge::initDir(const std::string& path, const DirType t)
 	if (path.empty())
 		return;
 
-	if (t == BASE)
-	{
-		if (m_dirTreeBase)
-			delete m_dirTreeBase;
-
+	if (t == BASE && !m_dirTreeBase)
 		m_dirTreeBase = new DirTree(path, &m_st);
-	}
-	else
-	{
-		if (m_dirTreeTarget)
-			delete m_dirTreeTarget;
+	else if(t == TARGET && !m_dirTreeTarget)
 		m_dirTreeTarget = new DirTree(path, &m_st);
-	}
 }
 
 void Merge::printStats(const DirType t)
@@ -236,4 +164,114 @@ void Merge::printStats(const DirType t)
 		std::cout << "\tDirs: " << std::to_string(m_dirTreeTarget->getDirsCount()) << "\n";
 		std::cout << "Total size: " << fileSizeToString(m_dirTreeTarget->getTotalSize()) << std::endl;
 	}
+}
+
+void Merge::viewDirStats(const std::string& basePath, const std::string& targetPath)
+{
+	if (basePath.empty() || targetPath.empty() || basePath == targetPath)
+	{
+		std::cout << "Invalid dirs!" << std::endl;
+		return;
+	}
+
+	initDirTree(basePath, targetPath);
+	freeMemory();
+}
+
+void Merge::freeMemory()
+{
+	if (m_dirTreeBase)
+	{
+		delete m_dirTreeBase;
+		m_dirTreeBase = nullptr;
+	}
+
+	if (m_dirTreeTarget)
+	{
+		delete m_dirTreeTarget;
+		m_dirTreeTarget = nullptr;
+	}		
+}
+
+void Merge::removeDirs() //remove unexisting dirs from target
+{
+	for (auto& d : m_dirTreeTarget->getUnexistedDirs()) 
+	{
+		try
+		{
+			if (exists(d->getPath()))
+				remove_all(d->getPath());
+		}
+		catch (std::exception& e)
+		{
+			m_errorMsg->add(e);
+		}
+		m_st.addProgress(1);
+	}
+}
+
+void Merge::removeFiles() //remove unexisting files from target
+{
+	for (auto& f : m_dirTreeTarget->getUnexistedFiles())
+	{
+		try
+		{
+			if (exists(f))
+				remove(f);
+		}
+		catch (std::exception& e)
+		{
+			m_errorMsg->add(e);
+		}
+		m_st.addProgress(1);
+	}
+}
+
+void Merge::addFiles() //add unexisting files to target
+{
+	const auto& target = m_dirTreeTarget->getHead()->getPath();
+	const auto& base = m_dirTreeBase->getHead()->getPath();
+
+	for (auto& f : m_dirTreeBase->getUnexistedFiles())
+	{
+		try
+		{
+			const auto targetParentPath = target / relative(f, base).parent_path();
+			copy(f, targetParentPath, std::filesystem::copy_options::overwrite_existing);
+		}
+		catch (std::exception& e)
+		{
+			m_errorMsg->add(e);
+		}
+		m_st.addProgress(1);
+	}
+}
+
+void Merge::addDirs() //add unexisting dirs to target
+{
+	std::string target = m_dirTreeTarget->getHead()->getPath().string() + "\\";
+	std::string base = m_dirTreeBase->getHead()->getPath().string();
+
+	for (auto& d : m_dirTreeBase->getUnexistedDirs())
+	{
+		try
+		{
+			const auto& dir = d->getPath();
+			std::filesystem::path p(target + dir.string().substr(base.size(), dir.string().size() - 1));
+			std::filesystem::create_directories(p);
+		}
+		catch (std::exception& e)
+		{
+			m_errorMsg->add(e);
+		}
+		m_st.addProgress(1);
+	}
+}
+
+void Merge::checkRecycleBin()
+{
+	std::filesystem::path bin(m_dirTreeTarget->getHead()->getPath().string() + "\\$RECYCLE.BIN");
+
+	if (std::filesystem::exists(bin))
+		std::filesystem::remove_all(bin);
 }

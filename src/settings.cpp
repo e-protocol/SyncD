@@ -35,14 +35,8 @@ void Settings::readSettings()
 		return;
 	}
 
-	if (std::filesystem::is_directory(m_baseDir))
-		m_merge->initDir(std::move(m_baseDir), Merge::BASE);
-
-	if (std::filesystem::is_directory(m_targetDir))
-		m_merge->initDir(std::move(m_targetDir), Merge::TARGET);
-
 	showPath();
-	m_merge->initDirTree(m_baseDir, m_targetDir);
+	m_merge->viewDirStats(m_baseDir, m_targetDir);
 }
 
 bool Settings::checkDirs()
@@ -114,31 +108,18 @@ void Settings::setPath(const std::string& path, Merge::DirType t)
 		m_targetDir = path;
 
 	writeSettings();
-	m_merge->initDir(path, t);
 }
 
 void Settings::mergeDirs()
 {
-	if (m_baseDir.empty() || m_targetDir.empty() || m_baseDir == m_targetDir)
-	{
-		std::cout << "Invalid dirs!" << std::endl;
-		return;
-	}
-
 	if (checkDirs())
 		m_merge->mergeDirs(m_baseDir, m_targetDir);
 }
 
 void Settings::viewDirStats()
 {
-	if (m_baseDir.empty() && m_targetDir.empty())
-	{
-		showPath();
-		return;
-	}
-
-	if(checkDirs())
-		m_merge->initDirTree(m_baseDir, m_targetDir);
+	if (checkDirs())
+		m_merge->viewDirStats(m_baseDir, m_targetDir);
 }
 
 std::string Settings::getCurrentDir()

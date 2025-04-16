@@ -1,0 +1,2 @@
+D:/Programs/VisualStudio2022/VSProjects/syncd/syncd/build/x64-debug/CMakeFiles/edit_cache.dir
+D:/Programs/VisualStudio2022/VSProjects/syncd/syncd/build/x64-debug/CMakeFiles/rebuild_cache.dir

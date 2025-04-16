@@ -1,0 +1,2 @@
+base_dir: E:\
+target_dir: G:\Storage

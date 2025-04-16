@@ -4,7 +4,7 @@
 #include "dirTree.hpp"
 #include "blockScreen.hpp"
 #include "error.hpp"
-#define THREADS 5
+#define THREADS 3
 
 class Merge
 {
@@ -30,12 +30,20 @@ public:
 		TARGET
 	};
 
-	void initDirTree(const std::string& basePath, const std::string& targetPath);
-	void initDir(const std::string& path, const DirType t);
 	void mergeDirs(const std::string& basePath, const std::string& targetPath);
+	void viewDirStats(const std::string& basePath, const std::string& targetPath);
+
 private:
 	void printStats(const DirType t);
 	void compareDirs();
 	void doMerge();
+	void initDir(const std::string& path, const DirType t);
+	void initDirTree(const std::string& basePath, const std::string& targetPath);
 	void callback(bool showStats);
+	void freeMemory();
+	void removeFiles();
+	void removeDirs();
+	void addFiles();
+	void addDirs();
+	void checkRecycleBin();
 };

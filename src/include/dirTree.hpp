@@ -116,60 +116,49 @@ public:
 		}
 	}
 
-	void doCompareDirs(std::vector<std::pair<Dir*, Dir*>>& pairDirs, const std::vector<Dir*>& dirs,
-						const std::vector<Dir*>& otherDirs, bool isDir)
+	//find same dir on same layer from otherDir
+	std::pair<Dir*, Dir*> findDirPair(Dir* const dir, Dir* const otherDir)
 	{
-		for (auto& d : dirs)
-		{
-			bool found = false;
+		const auto& otherDirs = otherDir->getDirs();
+		Dir* other = nullptr;
 
-			for (auto& o : otherDirs)
-				if (d->getPath().filename() == o->getPath().filename())
-				{
-					pairDirs.emplace_back(std::pair(d, o));
-					found = true;
-					break;
-				}
-
-			if (!found)
+		for (const auto& d : otherDirs)
+			if (d->getPath().filename() == dir->getPath().filename())
 			{
-				pairDirs.emplace_back(std::pair(d, nullptr));
-
-				if(isDir)
-					m_unexistedDirs.emplace_back(d);
+				other = d;
+				break;
 			}
-		}
+
+		return std::pair(dir, other);
 	}
 
 	void compareDirs(Dir* upDir, Dir* otherUpDir) //recursive func
 	{
-		using namespace std::filesystem;
 		const std::vector<Dir*>& dirs = upDir->getDirs();
 
 		if (!otherUpDir) //if not existed, all elements are unexisted
 		{
 			for (auto& d : dirs)
+			{
 				m_unexistedDirs.emplace_back(d);
+				compareDirs(d, nullptr); //repeat for all internal dirs
+			}
 
 			compareFiles(upDir, otherUpDir);
-
-			//repeat for all internal dirs
-			for (auto& d : dirs)
-				compareDirs(d, nullptr);
 			return;
 		}
 
 		compareFiles(upDir, otherUpDir);
-		const std::vector<Dir*>& otherDirs = otherUpDir->getDirs();
-		std::vector<std::pair<Dir*, Dir*>> pairDirs; //create same dir pairs on same layer
-		pairDirs.reserve(dirs.size() + otherDirs.size()); //avoid realloc
-		doCompareDirs(pairDirs, dirs, otherDirs, true);
 
 		//repeat for all internal dirs
-		for (auto& p : pairDirs)
-			compareDirs(p.first, p.second);
+		for (auto& d : dirs)
+		{
+			auto pair = findDirPair(d, otherUpDir);
+			compareDirs(pair.first, pair.second);
+		}
 	}
 
+	//find same files on same dir layer and compare them
 	void compareFiles(Dir* dir, Dir* otherDir)
 	{
 		using namespace std::filesystem;
